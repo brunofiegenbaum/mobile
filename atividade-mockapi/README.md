@@ -1,6 +1,6 @@
 # Atividade MockAPI - Meus Livros
 
-Aplicativo de cadastro e listagem de livros com React Native, Expo, Expo Router e MockAPI, seguindo a aula 14 do professor Mateus Roveda.
+Aplicativo de cadastro e listagem de livros com React Native, **Expo SDK 58**, Expo Router e MockAPI, seguindo o estilo da aula 14 do professor Mateus Roveda.
 
 ## Recurso no MockAPI
 
@@ -23,17 +23,21 @@ O MockAPI cria `id` e `createdAt` automaticamente; não é necessário criá-los
 6. Abra `src/app/index.js` e substitua `COLE_AQUI_A_URL_DO_MOCKAPI` pela URL real.
 7. Abra a URL no navegador para conferir a resposta JSON.
 
-## Executar
+## Executar com Expo SDK 58
 
-Abra o terminal **dentro desta pasta**:
+É necessário **Node.js 22.13 ou superior**. Abra o terminal dentro da pasta do projeto:
 
 ```bash
 cd atividade-mockapi
 npm install
-npm start
+npx expo install --fix
+npx expo-doctor@latest
+npx expo start --tunnel --clear
 ```
 
-Use o Expo Go no celular ou a opção web do Expo. É necessário ter acesso à internet.
+O SDK 58 possui um túnel novo que não depende da instalação global de `@expo/ngrok`. No iPhone, use um Expo Go compatível com SDK 58. Se você já tinha instalado as dependências antigas localmente, remova a pasta `node_modules` **dentro de atividade-mockapi** e execute `npm install` novamente.
+
+O projeto usa Expo Go no celular ou Expo Web. É necessário ter acesso à internet.
 
 ## Funcionamento
 
@@ -45,5 +49,6 @@ Use o Expo Go no celular ou a opção web do Expo. É necessário ter acesso à 
 Referências:
 - https://github.com/mateusrovedaa/aulas-mobile-tecnico-2026B/tree/main/14-aula
 - https://roveda.dev/materiais/api
+- https://expo.dev/changelog/sdk-58
 
-**Observação:** a conta e o recurso do MockAPI precisam ser criados pelo aluno. O aplicativo já está preparado, mas o GET e o POST só poderão ser testados depois que a URL real for configurada.
+**Observação:** a conta e o recurso do MockAPI precisam ser criados pelo aluno. O aplicativo está preparado, mas o GET e o POST só poderão ser testados depois que a URL real for configurada.
