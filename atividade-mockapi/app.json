@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Meus Livros",
+    "slug": "meus-livros",
+    "scheme": "meuslivros",
+    "plugins": [
+      "expo-router"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
