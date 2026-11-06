@@ -52,3 +52,15 @@ Referências:
 - https://expo.dev/changelog/sdk-58
 
 **Observação:** a conta e o recurso do MockAPI precisam ser criados pelo aluno. O aplicativo está preparado, mas o GET e o POST só poderão ser testados depois que a URL real for configurada.
+
+## Aula 15 - Editar e excluir
+
+O aplicativo segue a estrutura de `hamburgueria.js` da aula 15 do professor, adaptada para os cinco campos de livros.
+
+- GET `/Livros`: lista os livros.
+- POST `/Livros`: cadastra um livro.
+- PUT `/Livros/:id`: edita o livro selecionado. O botão Editar preenche o formulário; Salvar edição envia o PUT.
+- DELETE `/Livros/:id`: exclui um livro.
+- Os botões Editar e Excluir ficam ao lado das informações de cada livro.
+
+Referência: https://github.com/mateusrovedaa/aulas-mobile-tecnico-2026B/tree/main/15-aula0611

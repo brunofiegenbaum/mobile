@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
+  View,
   Button,
   FlatList,
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
+
+const API_URL = "https://6aee55c9a677fe0fc14fdd41.mockapi.io/livros/v1/Livros";
 
 export default function Livros() {
   const [livros, setLivros] = useState([]);
@@ -16,27 +19,42 @@ export default function Livros() {
   const [generoLivro, setGeneroLivro] = useState("");
   const [anoLivro, setAnoLivro] = useState("");
   const [editoraLivro, setEditoraLivro] = useState("");
+  const [idEditando, setIdEditando] = useState(0);
 
   async function buscarLivros() {
-    const resposta = await fetch(
-      "https://6aee55c9a677fe0fc14fdd41.mockapi.io/livros/v1/Livros",
-    );
+    const resposta = await fetch(API_URL);
     const dados = await resposta.json();
     setLivros(dados);
   }
 
   async function salvarLivro() {
-    await fetch("https://6aee55c9a677fe0fc14fdd41.mockapi.io/livros/v1/Livros", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        titulo: tituloLivro,
-        autor: autorLivro,
-        genero: generoLivro,
-        ano: anoLivro,
-        editora: editoraLivro,
-      }),
-    });
+    if (idEditando === 0) {
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo: tituloLivro,
+          autor: autorLivro,
+          genero: generoLivro,
+          ano: anoLivro,
+          editora: editoraLivro,
+        }),
+      });
+    } else {
+      await fetch(API_URL + "/" + idEditando, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo: tituloLivro,
+          autor: autorLivro,
+          genero: generoLivro,
+          ano: anoLivro,
+          editora: editoraLivro,
+        }),
+      });
+
+      setIdEditando(0);
+    }
     setTituloLivro("");
     setAutorLivro("");
     setGeneroLivro("");
@@ -44,6 +62,22 @@ export default function Livros() {
     setEditoraLivro("");
 
     buscarLivros();
+  }
+
+  async function excluir(id) {
+    await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+    });
+    buscarLivros();
+  }
+
+  async function editar(item) {
+    setIdEditando(item.id);
+    setTituloLivro(item.titulo);
+    setAutorLivro(item.autor);
+    setGeneroLivro(item.genero);
+    setAnoLivro(item.ano);
+    setEditoraLivro(item.editora);
   }
 
   useEffect(() => {
@@ -86,15 +120,27 @@ export default function Livros() {
         placeholder="Editora do livro"
       />
 
-      <Button title="Salvar livro" onPress={salvarLivro} />
+      <View style={styles.botaoSalvar}>
+        <Button title={idEditando === 0 ? "Salvar livro" : "Salvar edição"} onPress={salvarLivro} />
+      </View>
 
       <FlatList
         style={styles.lista}
         data={livros}
         renderItem={({ item }) => (
-          <Text style={styles.item}>
-            {item.id} - {item.titulo} - {item.autor} - {item.genero} - {item.ano} - {item.editora}
-          </Text>
+          <View style={styles.item}>
+            <View style={styles.informacoes}>
+              <Text style={styles.nome}>{item.titulo}</Text>
+              <Text style={styles.detalhes}>Autor: {item.autor}</Text>
+              <Text style={styles.detalhes}>Gênero: {item.genero}</Text>
+              <Text style={styles.detalhes}>Ano: {item.ano}</Text>
+              <Text style={styles.detalhes}>Editora: {item.editora}</Text>
+            </View>
+            <View style={styles.botoes}>
+              <Button title="Editar" onPress={() => editar(item)} />
+              <Button title="Excluir" color="#C62828" onPress={() => excluir(item.id)} />
+            </View>
+          </View>
         )}
       />
     </SafeAreaView>
@@ -119,6 +165,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
+  botaoSalvar: {
+    marginBottom: 8,
+  },
+
   lista: {
     flex: 1,
     marginTop: 16,
@@ -129,7 +179,31 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
-    fontSize: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+
+  informacoes: {
+    flex: 1,
+  },
+
+  nome: {
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#111827",
+    marginBottom: 6,
+  },
+
+  detalhes: {
+    fontSize: 14,
+    color: "#374151",
+    marginBottom: 3,
+  },
+
+  botoes: {
+    gap: 8,
+    minWidth: 90,
   },
 });
