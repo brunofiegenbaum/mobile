@@ -2,124 +2,99 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
-  View,
   Button,
   FlatList,
   TextInput,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 
-// Cole aqui a URL do recurso 'livros' criado no seu MockAPI.
-// Exemplo: https://SEU-PROJETO.mockapi.io/api/v1/livros
-const API = "COLE_AQUI_A_URL_DO_MOCKAPI";
-
 export default function Livros() {
   const [livros, setLivros] = useState([]);
-  const [titulo, setTitulo] = useState("");
-  const [autor, setAutor] = useState("");
-  const [genero, setGenero] = useState("");
-  const [ano, setAno] = useState("");
-  const [editora, setEditora] = useState("");
-  const [carregando, setCarregando] = useState(false);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
+  const [tituloLivro, setTituloLivro] = useState("");
+  const [autorLivro, setAutorLivro] = useState("");
+  const [generoLivro, setGeneroLivro] = useState("");
+  const [anoLivro, setAnoLivro] = useState("");
+  const [editoraLivro, setEditoraLivro] = useState("");
 
-  async function carregar() {
-    if (!API.startsWith("https://")) {
-      setErro("Configure a URL do MockAPI no arquivo src/app/index.js.");
-      return;
-    }
-
-    setCarregando(true);
-    setErro("");
-    try {
-      const resposta = await fetch(API);
-      if (!resposta.ok) throw new Error("Erro ao buscar os livros.");
-      const dados = await resposta.json();
-      setLivros(dados);
-    } catch (erro) {
-      setErro("Não foi possível carregar os livros. Confira a URL e a internet.");
-    } finally {
-      setCarregando(false);
-    }
+  async function buscarLivros() {
+    const resposta = await fetch(
+      "https://6aee55c9a677fe0fc14fdd41.mockapi.io/livros/v1/Livros",
+    );
+    const dados = await resposta.json();
+    setLivros(dados);
   }
 
-  async function salvar() {
-    if (!titulo.trim() || !autor.trim() || !genero.trim() || !ano.trim() || !editora.trim()) {
-      Alert.alert("Atenção", "Preencha os cinco campos.");
-      return;
-    }
-    if (!API.startsWith("https://")) {
-      Alert.alert("Atenção", "Configure a URL do MockAPI primeiro.");
-      return;
-    }
+  async function salvarLivro() {
+    await fetch("https://6aee55c9a677fe0fc14fdd41.mockapi.io/livros/v1/Livros", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        titulo: tituloLivro,
+        autor: autorLivro,
+        genero: generoLivro,
+        ano: anoLivro,
+        editora: editoraLivro,
+      }),
+    });
+    setTituloLivro("");
+    setAutorLivro("");
+    setGeneroLivro("");
+    setAnoLivro("");
+    setEditoraLivro("");
 
-    setSalvando(true);
-    try {
-      const resposta = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          titulo: titulo.trim(),
-          autor: autor.trim(),
-          genero: genero.trim(),
-          ano: ano.trim(),
-          editora: editora.trim(),
-        }),
-      });
-      if (!resposta.ok) throw new Error("Erro ao salvar o livro.");
-
-      setTitulo("");
-      setAutor("");
-      setGenero("");
-      setAno("");
-      setEditora("");
-      await carregar();
-      Alert.alert("Pronto", "Livro cadastrado!");
-    } catch (erro) {
-      Alert.alert("Erro", "Não foi possível salvar o livro.");
-    } finally {
-      setSalvando(false);
-    }
+    buscarLivros();
   }
 
   useEffect(() => {
-    carregar();
+    buscarLivros();
   }, []);
 
   return (
     <SafeAreaView style={styles.tela} edges={["bottom"]}>
       <Stack.Screen options={{ title: "Meus livros" }} />
 
-      <Text style={styles.titulo}>Cadastrar livro</Text>
-      <TextInput style={styles.campo} placeholder="Título" value={titulo} onChangeText={setTitulo} />
-      <TextInput style={styles.campo} placeholder="Autor" value={autor} onChangeText={setAutor} />
-      <TextInput style={styles.campo} placeholder="Gênero" value={genero} onChangeText={setGenero} />
-      <TextInput style={styles.campo} placeholder="Ano de publicação" keyboardType="numeric" value={ano} onChangeText={setAno} />
-      <TextInput style={styles.campo} placeholder="Editora" value={editora} onChangeText={setEditora} />
+      <TextInput
+        style={styles.campo}
+        value={tituloLivro}
+        onChangeText={setTituloLivro}
+        placeholder="Título do livro"
+      />
+      <TextInput
+        style={styles.campo}
+        value={autorLivro}
+        onChangeText={setAutorLivro}
+        placeholder="Autor do livro"
+      />
+      <TextInput
+        style={styles.campo}
+        value={generoLivro}
+        onChangeText={setGeneroLivro}
+        placeholder="Gênero do livro"
+      />
+      <TextInput
+        style={styles.campo}
+        value={anoLivro}
+        onChangeText={setAnoLivro}
+        keyboardType="numeric"
+        placeholder="Ano do livro"
+      />
+      <TextInput
+        style={styles.campo}
+        value={editoraLivro}
+        onChangeText={setEditoraLivro}
+        placeholder="Editora do livro"
+      />
 
-      <Button title={salvando ? "Salvando..." : "Salvar livro"} onPress={salvar} disabled={salvando} />
-      <Text style={styles.titulo}>Livros cadastrados</Text>
-      {carregando && <ActivityIndicator />}
-      {!!erro && <Text style={styles.erro}>{erro}</Text>}
+      <Button title="Salvar livro" onPress={salvarLivro} />
+
       <FlatList
         style={styles.lista}
         data={livros}
-        keyExtractor={(item) => String(item.id)}
-        onRefresh={carregar}
-        refreshing={carregando}
-        ListEmptyComponent={!carregando && !erro ? <Text>Nenhum livro cadastrado.</Text> : null}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.nome}>{item.titulo}</Text>
-            <Text>Autor: {item.autor}</Text>
-            <Text>Gênero: {item.genero}</Text>
-            <Text>Ano: {item.ano}</Text>
-            <Text>Editora: {item.editora}</Text>
-          </View>
+          <Text style={styles.item}>
+            {item.id} - {item.titulo} - {item.autor} - {item.genero} - {item.ano} - {item.editora}
+          </Text>
         )}
       />
     </SafeAreaView>
@@ -133,13 +108,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
   },
-  titulo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 12,
-    marginTop: 16,
-    color: "#111827",
-  },
+
   campo: {
     borderWidth: 1,
     borderColor: "#D9DDE3",
@@ -149,13 +118,18 @@ const styles = StyleSheet.create({
     color: "#111827",
     marginBottom: 12,
   },
-  lista: { flex: 1, marginTop: 8 },
+
+  lista: {
+    flex: 1,
+    marginTop: 16,
+  },
+
   item: {
     backgroundColor: "#F1F3F6",
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
+    fontSize: 15,
+    color: "#111827",
   },
-  nome: { fontSize: 16, fontWeight: "bold", marginBottom: 8 },
-  erro: { color: "#B91C1C", marginBottom: 12 },
 });
