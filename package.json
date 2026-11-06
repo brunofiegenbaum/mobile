@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "expo": "^58.0.19",
+    "ngrok": "^5.0.0-beta.2"
+  }
+}
